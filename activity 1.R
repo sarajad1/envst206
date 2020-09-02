@@ -12,5 +12,7 @@ x^2
 b <- c(4, 10, 12, 16)
 #multiple vector by 5
 b*5
+#making a different vector
 a <- c(10, 20, 30, 40)
+#multiply vector by 10 and divide by 2
 a*10/2
