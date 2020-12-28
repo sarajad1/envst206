@@ -3,11 +3,17 @@ ag2017 <- read.csv("/users/sara/downloads/2017ag.csv")
 #load in california 2018 yield data
 ag2018 <- read.csv("/users/sara/downloads/2018ag.csv")
 
-#look at just almonds all
+#install packages
+library(sp)
+library(rgdal)
+library(dplyr)
+library(ggplot2)
+
+#look at just "almonds all" commodity
 dat17 <- ag2017[ag2017$Commodity.Code == c(261999),]
 dat18 <- ag2018[ag2018$Commodity.Code == c(261999),]
 
-#dataframe with just year, crop, county, yield, unit
+#new dataframe with just year, crop, county, yield, and unit
 dat2017 <- na.omit(data.frame(year=dat17$Year,
                            crop=dat17$Crop.Name,
                            crop.code=dat17$Commodity.Code,
@@ -22,22 +28,18 @@ dat2018 <- na.omit(data.frame(year=dat18$Year,
                               county=dat18$County,
                               yield=dat18$Yield,
                               unit=dat18$Unit))
-#install packages
-library(sp)
-library(rgdal)
-library(dplyr)
-library(ggplot2)
 
 #joining almond data for 2017 and 2018
 agAll <- full_join(dat2017,dat2018)
 
 #deleting counties that didn't produce both years
 agAll <- agAll[-c(19, 40, 21, 29, 18, 39), ]
+
 #making year into a character variable
 agAll$year <- as.character(agAll$year)
 
 
-#plot almond yield for 2017 and 2018 per county
+#plot with almond yield for 2017 and 2018 per county
 ggplot(agAll, aes(x=county, y=yield, fill=year))+
   geom_bar(stat="identity", position=position_dodge2())+
   labs(x="County", y="Yield in tons")+
@@ -57,6 +59,9 @@ agAlmonds$diff <- ((agAlmonds$`2018 Yield`-agAlmonds$`2017 Yield`)/agAlmonds$`20
 #removing "sum of all others" row
 agAlmonds <- agAlmonds[-c(18), ]
 
+#mean and standard deviation of % change
+mean(agAlmonds$diff)
+sd(agAlmonds$diff)
 
 #read in drought data
 drought2017 <- read.csv("/users/sara/downloads/dm_export_20170101_20171231.csv")
@@ -76,6 +81,10 @@ colnames(datDR) <- c("County","D1.2017","D1.2018")
 
 #add column for percent change in drought levels between two years
 datDR$Percent.Change <- ((datDR$D1.2018-datDR$D1.2017)/datDR$D1.2018)*100
+
+#mean and standard deviation of % change
+mean(datDR$Percent.Change)
+sd(datDR$Percent.Change)
 
 #only looking at counties that produced almonds
 datD <- datDR[c(4,6,10,11,15,16,20,24,34,39,48,50,51,52,54,57,58), ]
